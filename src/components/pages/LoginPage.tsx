@@ -1,16 +1,16 @@
-import AuthImageCol from "../reusables/auth/authImageCol";
-// import LoginWithEmailAndOTP from "../features/login/LoginWithEmailAndOTP";
-// import LoginWithPhoneAndOTP from "../features/login/LoginWithPhoneAndOTP";
-import { Link } from "react-router";
-import { useState } from "react";
-import LoginWithEmailPassword from "../features/login/LoginWithEmailPassword";
+import AuthImageCol from '../reusables/auth/authImageCol';
+// import LoginWithEmailAndOTP from '../features/login/LoginWithEmailAndOTP';
+// import LoginWithPhoneAndOTP from '../features/login/LoginWithPhoneAndOTP';
+// import { Link } from 'react-router';
+import { useState } from 'react';
+import LoginWithEmailPassword from '../features/login/LoginWithEmailPassword';
 
 const LoginPage = () => {
-  const [loginWith, setLoginWith] = useState("phone");
+  const [loginWith, setLoginWith] = useState('phone');
 
-  const handleLoginWithChange = (value: string) => {
-    setLoginWith(value);
-  };
+  // const handleLoginWithChange = (value: string) => {
+  //   setLoginWith(value);
+  // };
 
   return (
     <section className="auth-section flex min-h-screen gap-4 p-7">
@@ -19,21 +19,17 @@ const LoginPage = () => {
       <div className="auth-form-col w-1/2">
         <div className="auth-form-col-inner flex h-[calc(100dvh-56px)] flex-col overflow-auto rounded-3xl bg-white p-15 pb-6">
           <div className="m-auto w-full max-w-127">
-            {/* {loginWith === "phone" && (
-              <LoginWithPhoneAndOTP
-                handleLoginWithChange={handleLoginWithChange}
-              />
+            {/* {loginWith === 'phone' && (
+              <LoginWithPhoneAndOTP handleLoginWithChange={handleLoginWithChange} />
             )}
 
-            {loginWith === "email" && (
-              <LoginWithEmailAndOTP
-                handleLoginWithChange={handleLoginWithChange}
-              />
+            {loginWith === 'email' && (
+              <LoginWithEmailAndOTP handleLoginWithChange={handleLoginWithChange} />
             )} */}
 
             <LoginWithEmailPassword />
 
-            <div className="mt-3 text-sm">
+            {/* <div className="mt-3 text-sm">
               <p className="text-gray-600">
                 By logging into your{" "}
                 <span className="font-semibold">QR Floor Genie software,</span>{" "}
@@ -54,7 +50,7 @@ const LoginPage = () => {
                   Privacy Policy
                 </Link>
               </p>
-            </div>
+            </div> */}
           </div>
           {/* <AuthFooter /> */}
         </div>

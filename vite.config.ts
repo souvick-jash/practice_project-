@@ -1,16 +1,8 @@
-// import { defineConfig } from 'vite'
-// import react from '@vitejs/plugin-react'
-
-// // https://vite.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-// })
-
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,8 +12,8 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   plugins: [
-    tailwindcss(),
     react(),
+    tailwindcss(),
     // react({
     //   babel: {
     //     plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
@@ -30,7 +22,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   server: {

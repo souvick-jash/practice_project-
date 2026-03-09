@@ -1,26 +1,26 @@
-import FormikInput from "@/components/reusables/formik/FormikInput";
-import { Button } from "../../../components/ui/";
-import { useLoginWithEmailPassword } from "@/hooks/userAuthHooks";
-import type { LoginFormWithEmailPasswordInitialValues } from "../../../types/types";
-import { errorTransformer } from "@/utils/error";
-import logger from "@/utils/logger";
-import { loginWithEmailPasswordValidationSchema } from "@/validations/schemas";
-import { Form, Formik, type FormikHelpers } from "formik";
-import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
+import FormikInput from '@/components/reusables/formik/FormikInput';
+import { Button } from '@/components/ui/button';
+import { useLoginWithEmailPassword } from '@/hooks/userAuthHooks';
+import type { LoginFormWithEmailPasswordInitialValues } from '@/types/types';
+import { errorTransformer } from '@/utils/error';
+import logger from '@/utils/logger';
+import { loginWithEmailPasswordValidationSchema } from '@/validations/schemas';
+import { Form, Formik, type FormikHelpers } from 'formik';
+import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
 
 const LoginWithEmailPassword = () => {
   const { mutate: loginMutation, isPending } = useLoginWithEmailPassword();
   const navigate = useNavigate();
 
   const initialValues: LoginFormWithEmailPasswordInitialValues = {
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   };
 
   const onSubmit = async (
     values: LoginFormWithEmailPasswordInitialValues,
-    formik: FormikHelpers<LoginFormWithEmailPasswordInitialValues>,
+    formik: FormikHelpers<LoginFormWithEmailPasswordInitialValues>
   ) => {
     const { email, password } = values;
     loginMutation(
@@ -30,7 +30,7 @@ const LoginWithEmailPassword = () => {
           formik.resetForm();
           formik.setSubmitting(false);
           logger.log(values);
-          navigate("/superadmin/dashboard");
+          navigate('/superadmin/dashboard');
         },
         onError: (error) => {
           formik.resetForm();
@@ -38,7 +38,7 @@ const LoginWithEmailPassword = () => {
           const message = errorTransformer(error);
           toast.error(message);
         },
-      },
+      }
     );
   };
 
@@ -55,12 +55,7 @@ const LoginWithEmailPassword = () => {
 
           return (
             <Form className="auth-form mt-7">
-              <FormikInput
-                type="text"
-                name="email"
-                label="Email"
-                placeholder="Enter your email"
-              />
+              <FormikInput type="text" name="email" label="Email" placeholder="Enter your email" />
 
               <FormikInput
                 type="password"
@@ -76,7 +71,7 @@ const LoginWithEmailPassword = () => {
                 className="block w-full"
                 variant="light"
               >
-                {isSubmitting || isPending ? "Logging in..." : "Login"}
+                {isSubmitting || isPending ? 'Logging in...' : 'Login'}
               </Button>
             </Form>
           );
