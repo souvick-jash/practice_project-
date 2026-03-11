@@ -10,7 +10,7 @@ import {
   useFetchTotalSubscribersCount,
 } from '@/hooks/dashboardHooks';
 
-const SubscriptionsBarChart = lazy(() => import('./SubscriptionBarChart'));
+// const SubscriptionsBarChart = lazy(() => import('./SubscriptionBarChart'));
 const MapSection = lazy(() => import('./MapSection'));
 
 const DashboardMainComp = () => {
@@ -70,9 +70,9 @@ const DashboardMainComp = () => {
           <SearchAndFilter placeholder="Search by store name or location" />
         </div>
 
-        <div className="mb-6 w-full">
+        {/* <div className="mb-6 w-full">
           <SubscriptionsBarChart />
-        </div>
+        </div> */}
 
         <div className="map-holder relative pb-15">
           <MapSection />

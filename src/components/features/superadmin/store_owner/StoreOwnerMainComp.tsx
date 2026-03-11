@@ -1,7 +1,20 @@
-import React from 'react';
+import { memo } from 'react';
+import StoreOwnersDataTable from './StoreOwnersDataTable';
 
 const StoreOwnerMainComp = () => {
-  return <div>StoreOwnerMainComp +++++++++++++++++++++++++</div>;
+  return (
+    <>
+      <div className="data-table-wrap">
+        <StoreOwnersDataTable />
+      </div>
+    </>
+  );
 };
 
-export default StoreOwnerMainComp;
+export default memo(StoreOwnerMainComp);
+
+// const StoreOwnerMainComp = () => {
+//   return <div>StoreOwnerMainComp</div>;
+// };
+
+// export default StoreOwnerMainComp;

@@ -1,11 +1,9 @@
-import * as React from "react";
+import * as React from 'react';
 
 const TABLET_BREAKPOINT = 1200;
 
 export function useIsTablet() {
-  const [isTablet, setIsTablet] = React.useState<boolean | undefined>(
-    undefined,
-  );
+  const [isTablet, setIsTablet] = React.useState<boolean | undefined>(undefined);
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${TABLET_BREAKPOINT - 1}px)`);
@@ -14,11 +12,11 @@ export function useIsTablet() {
       setIsTablet(window.innerWidth < TABLET_BREAKPOINT);
     };
 
-    mql.addEventListener("change", onChange);
+    mql.addEventListener('change', onChange);
     setIsTablet(window.innerWidth < TABLET_BREAKPOINT);
 
     return () => {
-      mql.removeEventListener("change", onChange);
+      mql.removeEventListener('change', onChange);
     };
   }, []);
 

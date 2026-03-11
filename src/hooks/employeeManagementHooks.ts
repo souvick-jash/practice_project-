@@ -1,17 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { timeConverter } from "@/utils/time";
-import supabase from "@/configs/supabse";
-import useAuthStore from "@/store/authStore";
-import { isCurrentUserActive } from "./enforceUserHooks";
-import { validStoreLocation } from "./generalHooks";
-import { generateRandomId } from "@/utils/strings";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { timeConverter } from '@/utils/time';
+import supabase from '@/configs/supabse';
+import useAuthStore from '@/store/authStore';
+import { isCurrentUserActive } from './enforceUserHooks';
+import { validStoreLocation } from './generalHooks';
+import { generateRandomId } from '@/utils/strings';
 
 interface CreateEmployeeInput {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
-  role: "manager" | "employee";
+  status: 'active' | 'inactive';
+  role: 'manager' | 'employee';
   store_location_id: string;
 }
 
@@ -20,8 +20,8 @@ interface UpdateEmployeeInput {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
-  role: "manager" | "employee";
+  status: 'active' | 'inactive';
+  role: 'manager' | 'employee';
   store_location_id: string;
 }
 
@@ -29,8 +29,8 @@ interface CreateEmployeeByManagerInput {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
-  role: "employee";
+  status: 'active' | 'inactive';
+  role: 'employee';
 }
 
 interface UpdateEmployeeByManagerInput {
@@ -38,7 +38,7 @@ interface UpdateEmployeeByManagerInput {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
 }
 
 // * ====================== Fetch All Employees ====================== *
@@ -46,7 +46,7 @@ const fetchAllEmployees = async () => {
   const userId = useAuthStore.getState().userProfile?.id;
 
   const { data: userData, error: userDataError } = await supabase
-    .from("users")
+    .from('users')
     .select(
       `
        id, name, unique_id,
@@ -65,21 +65,18 @@ const fetchAllEmployees = async () => {
           )
          )
        )
-      `,
+      `
     )
-    .eq("id", userId)
+    .eq('id', userId)
     .maybeSingle();
 
-  if (!userData) throw new Error("User not found");
+  if (!userData) throw new Error('User not found');
   if (userDataError) throw userDataError;
 
   const storeEmployees =
     (userData &&
       userData.store_owner?.flatMap(
-        (owner) =>
-          owner.store_location?.flatMap(
-            (location) => location.store_employees ?? [],
-          ) ?? [],
+        (owner) => owner.store_location?.flatMap((location) => location.store_employees ?? []) ?? []
       )) ??
     [];
 
@@ -90,16 +87,16 @@ const fetchAllEmployees = async () => {
 
 export const useFetchAllEmployees = () => {
   return useQuery({
-    queryKey: ["employees"],
+    queryKey: ['employees'],
     queryFn: fetchAllEmployees,
-    staleTime: timeConverter(20, "minute"),
+    staleTime: timeConverter(20, 'minute'),
   });
 };
 
 // * ====================== Fetch Single Employee ====================== *
 const fetchSingleEmployee = async (employeeId: string) => {
   const { data, error } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .select(
       `
         id, user_id, store_location_id,
@@ -109,9 +106,9 @@ const fetchSingleEmployee = async (employeeId: string) => {
         store_location:store_locations (
           id, name
         )
-    `,
+    `
     )
-    .eq("id", employeeId)
+    .eq('id', employeeId)
     .maybeSingle();
 
   const result = data;
@@ -122,10 +119,10 @@ const fetchSingleEmployee = async (employeeId: string) => {
 
 export const useFetchSingleEmployee = (employeeId?: string, open?: boolean) => {
   return useQuery({
-    queryKey: ["employee", employeeId],
+    queryKey: ['employee', employeeId],
     queryFn: () => fetchSingleEmployee(employeeId!),
     enabled: open,
-    staleTime: timeConverter(10, "minute"),
+    staleTime: timeConverter(10, 'minute'),
   });
 };
 
@@ -144,46 +141,42 @@ export const createEmployee = async (employeeData: CreateEmployeeInput) => {
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
   // ? ---------- Store Location Check -----------
   const isValid = await validStoreLocation(store_location_id);
   if (!isValid) {
-    throw new Error("Store location is not valid");
+    throw new Error('Store location is not valid');
   }
 
   // ? ---------- Duplicate User Check ----------
   const { data: existingUsers, error: fetchError } = await supabase
-    .from("users")
-    .select("id")
+    .from('users')
+    .select('id')
     .or(`email.eq.${email},phone.eq.${phone}`);
 
   if (fetchError) throw fetchError;
 
   if (existingUsers?.length > 0) {
-    throw new Error(
-      "Employee with the same email or phone number already exists",
-    );
+    throw new Error('Employee with the same email or phone number already exists');
   }
 
   // ? ---------- Create Auth User ----------
-  const { data: authData, error: authError } =
-    await supabase.auth.admin.createUser({
-      email,
-      phone,
-      password,
-      email_confirm: true,
-      user_metadata: { display_name: name },
-    });
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    phone,
+    password,
+    email_confirm: true,
+    user_metadata: { display_name: name },
+  });
 
-  if (authError || !authData?.user)
-    throw authError || new Error("User creation failed");
+  if (authError || !authData?.user) throw authError || new Error('User creation failed');
   const authUserId = authData.user.id;
 
   // ? ---------- Insert into Users Table ----------
   const { error: dbError, data: insertedUserData } = await supabase
-    .from("users")
+    .from('users')
     .insert({
       auth_user_id: authUserId,
       unique_id,
@@ -199,18 +192,16 @@ export const createEmployee = async (employeeData: CreateEmployeeInput) => {
 
   if (dbError || !insertedUserData?.length) {
     await supabase.auth.admin.deleteUser(authUserId); // rollback
-    throw dbError || new Error("Failed to insert user record");
+    throw dbError || new Error('Failed to insert user record');
   }
 
   const insertedUserId = insertedUserData[0].id;
 
   // ? ---------- Insert into store_employees ----------
-  const { error: storeOwnerError } = await supabase
-    .from("store_employees")
-    .insert({
-      store_location_id,
-      user_id: insertedUserId,
-    });
+  const { error: storeOwnerError } = await supabase.from('store_employees').insert({
+    store_location_id,
+    user_id: insertedUserId,
+  });
 
   if (storeOwnerError) {
     await supabase.auth.admin.deleteUser(authUserId); // rollback
@@ -226,7 +217,7 @@ export const useCreateEmployee = () => {
   return useMutation({
     mutationFn: createEmployee,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employees'], exact: false });
     },
   });
 };
@@ -246,43 +237,39 @@ export const deleteEmployee = async ({
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
-  if (!userId) throw new Error("User cannot be fetched");
+  if (!userId) throw new Error('User cannot be fetched');
 
   // Get auth_user_id for Auth deletion
   const { data: userData, error: fetchError } = await supabase
-    .from("users")
-    .select("auth_user_id, role")
-    .eq("id", userId)
+    .from('users')
+    .select('auth_user_id, role')
+    .eq('id', userId)
     .maybeSingle();
 
   if (fetchError || !userData?.auth_user_id) {
-    throw fetchError || new Error("User not found");
+    throw fetchError || new Error('User not found');
   }
 
   const authUserId = userData.auth_user_id;
 
   // Delete from store_employees
   const { error: storeOwnerDeleteError } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .delete()
-    .eq("id", employeeId);
+    .eq('id', employeeId);
 
   if (storeOwnerDeleteError) throw storeOwnerDeleteError;
 
   // Delete from users table
-  const { error: userDeleteError } = await supabase
-    .from("users")
-    .delete()
-    .eq("id", userId);
+  const { error: userDeleteError } = await supabase.from('users').delete().eq('id', userId);
 
   if (userDeleteError) throw userDeleteError;
 
   // Delete from Supabase Auth
-  const { error: authDeleteError } =
-    await supabase.auth.admin.deleteUser(authUserId);
+  const { error: authDeleteError } = await supabase.auth.admin.deleteUser(authUserId);
 
   if (authDeleteError) throw authDeleteError;
 
@@ -293,16 +280,11 @@ export const useDeleteEmployee = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      employeeId,
-    }: {
-      userId: string;
-      employeeId: string;
-    }) => deleteEmployee({ userId, employeeId }),
+    mutationFn: ({ userId, employeeId }: { userId: string; employeeId: string }) =>
+      deleteEmployee({ userId, employeeId }),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employees'], exact: false });
     },
   });
 };
@@ -324,34 +306,34 @@ export const updateEmployee = async ({
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
   // ? ---------- Store Location Check -----------
   const isValid = await validStoreLocation(store_location_id);
   if (!isValid) {
-    throw new Error("Store location is not valid");
+    throw new Error('Store location is not valid');
   }
 
   const userProfile = useAuthStore.getState().userProfile;
 
   // Optional: check for duplicates if email/phone changed (excluding self)
   const { data: existingUsers, error: checkError } = await supabase
-    .from("users")
-    .select("id")
+    .from('users')
+    .select('id')
     .or(`email.eq.${email},phone.eq.${phone}`)
-    .neq("id", userId);
+    .neq('id', userId);
 
   if (checkError) throw checkError;
   if (existingUsers?.length) {
-    throw new Error("Employee with this email or phone number already exists");
+    throw new Error('Employee with this email or phone number already exists');
   }
 
   const { data: employee, error: fetchEmployeeError } = await supabase
-    .from("users")
-    .select("auth_user_id")
-    .in("role", ["employee", "manager"])
-    .eq("id", userId)
+    .from('users')
+    .select('auth_user_id')
+    .in('role', ['employee', 'manager'])
+    .eq('id', userId)
     .maybeSingle();
 
   if (fetchEmployeeError) throw fetchEmployeeError;
@@ -359,21 +341,18 @@ export const updateEmployee = async ({
   const auth_user_id = employee?.auth_user_id;
 
   // Update Supabase Auth email & metadata
-  const { error: authError } = await supabase.auth.admin.updateUserById(
-    auth_user_id,
-    {
-      email,
-      phone,
-      user_metadata: {
-        display_name: name,
-      },
+  const { error: authError } = await supabase.auth.admin.updateUserById(auth_user_id, {
+    email,
+    phone,
+    user_metadata: {
+      display_name: name,
     },
-  );
+  });
   if (authError) throw authError;
 
   // Update in users table
   const { error: dbError } = await supabase
-    .from("users")
+    .from('users')
     .update({
       name,
       email,
@@ -383,18 +362,18 @@ export const updateEmployee = async ({
       updated_by_user_id: userProfile?.id,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", userId);
+    .eq('id', userId);
 
   if (dbError) throw dbError;
 
   // Update in store_employees or store_managers table
   const { error: storeOwnerUpdateError } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .update({
       store_location_id: store_location_id ? store_location_id : null,
       updated_at: new Date().toISOString(),
     })
-    .eq("user_id", userId);
+    .eq('user_id', userId);
 
   if (storeOwnerUpdateError) throw storeOwnerUpdateError;
 
@@ -407,14 +386,14 @@ export const useUpdateEmployee = () => {
   return useMutation({
     mutationFn: updateEmployee,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["employee"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employees'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employee'], exact: false });
       queryClient.invalidateQueries({
-        queryKey: ["owner-store-locations"],
+        queryKey: ['owner-store-locations'],
         exact: false,
       });
       queryClient.invalidateQueries({
-        queryKey: ["employee-store-locations"],
+        queryKey: ['employee-store-locations'],
         exact: false,
       });
     },
@@ -426,9 +405,9 @@ const fetchOwnerStoreLocations = async () => {
   const userId = useAuthStore.getState().userProfile?.id;
 
   const { data: storeOwnerData, error: storeOwneError } = await supabase
-    .from("store_owners")
-    .select("id")
-    .eq("user_id", userId)
+    .from('store_owners')
+    .select('id')
+    .eq('user_id', userId)
     .maybeSingle();
 
   if (storeOwneError) throw storeOwneError;
@@ -437,15 +416,15 @@ const fetchOwnerStoreLocations = async () => {
   if (!storeOwnerId) return [];
 
   const { data, error } = await supabase
-    .from("store_locations")
+    .from('store_locations')
     .select(
       `
     id, name, status
-   `,
+   `
     )
-    .eq("status", "active")
-    .eq("store_owner_id", storeOwnerId)
-    .order("created_at", { ascending: false });
+    .eq('status', 'active')
+    .eq('store_owner_id', storeOwnerId)
+    .order('created_at', { ascending: false });
 
   const result = data;
 
@@ -455,9 +434,9 @@ const fetchOwnerStoreLocations = async () => {
 
 export const useFetchOwnerStoreLocations = () => {
   return useQuery({
-    queryKey: ["owner-store-locations"],
+    queryKey: ['owner-store-locations'],
     queryFn: fetchOwnerStoreLocations,
-    staleTime: timeConverter(20, "minute"),
+    staleTime: timeConverter(20, 'minute'),
   });
 };
 
@@ -466,7 +445,7 @@ const fetchStoreLocationsForEmployee = async () => {
   const userId = useAuthStore.getState().userProfile?.id;
 
   const { data: employeeData, error: employeeError } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .select(
       `
       id, user_id, store_location_id,
@@ -476,10 +455,10 @@ const fetchStoreLocationsForEmployee = async () => {
       store_location:store_locations (
         id, name, status
       )
-     `,
+     `
     )
-    .eq("user.id", userId)
-    .not("user", "is", null)
+    .eq('user.id', userId)
+    .not('user', 'is', null)
     .maybeSingle();
 
   if (employeeError) throw employeeError;
@@ -498,22 +477,22 @@ const fetchStoreLocationsForEmployee = async () => {
 
 export const useFetchStoreLocationsForEmployee = () => {
   return useQuery({
-    queryKey: ["employee-store-locations"],
+    queryKey: ['employee-store-locations'],
     queryFn: fetchStoreLocationsForEmployee,
-    staleTime: timeConverter(20, "minute"),
+    staleTime: timeConverter(20, 'minute'),
   });
 };
 
 // * ====================== Fetch Employees who shares the same location ====================== *
 const fetchEmployeesInSameLocations = async () => {
   const userId = useAuthStore.getState().userProfile?.id;
-  if (!userId) throw new Error("User not found");
+  if (!userId) throw new Error('User not found');
 
   // Get Employee
   const { data: employeeData, error: employeeError } = await supabase
-    .from("store_employees")
-    .select("id, store_location_id")
-    .eq("user_id", userId)
+    .from('store_employees')
+    .select('id, store_location_id')
+    .eq('user_id', userId)
     .maybeSingle();
 
   if (employeeError) throw employeeError;
@@ -522,7 +501,7 @@ const fetchEmployeesInSameLocations = async () => {
 
   // Fetch the employees
   const { data, error } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .select(
       `
         id, user_id, store_location_id,
@@ -532,12 +511,12 @@ const fetchEmployeesInSameLocations = async () => {
         store_location:store_locations (
           id, name
         )
-    `,
+    `
     )
-    .neq("user_id", userId) // Exclude current user
-    .eq("store_location_id", store_location_id)
-    .not("user", "is", null)
-    .order("created_at", { ascending: false });
+    .neq('user_id', userId) // Exclude current user
+    .eq('store_location_id', store_location_id)
+    .not('user', 'is', null)
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
 
@@ -547,9 +526,9 @@ const fetchEmployeesInSameLocations = async () => {
 
 export const useEmployeesInSameLocations = () => {
   return useQuery({
-    queryKey: ["employees-in-same-locations"],
+    queryKey: ['employees-in-same-locations'],
     queryFn: fetchEmployeesInSameLocations,
-    staleTime: timeConverter(20, "minute"),
+    staleTime: timeConverter(20, 'minute'),
   });
 };
 
@@ -558,9 +537,7 @@ export const useEmployeesInSameLocations = () => {
 // ? ======================================
 
 // * ====================== Create Employee ====================== *
-export const createEmployeeByManager = async (
-  employeeData: CreateEmployeeByManagerInput,
-) => {
+export const createEmployeeByManager = async (employeeData: CreateEmployeeByManagerInput) => {
   const userProfile = useAuthStore.getState().userProfile;
   const { name, email, phone, role, status } = employeeData;
   const password = `Password@${new Date().getFullYear()}`;
@@ -568,20 +545,20 @@ export const createEmployeeByManager = async (
 
   const user_id = userProfile?.id;
   const { data: userData, error: fetchUserDataError } = await supabase
-    .from("users")
+    .from('users')
     .select(
       `
       *,
       store_employee:store_employees (
         *
       )
-      `,
+      `
     )
-    .eq("id", user_id)
+    .eq('id', user_id)
     .maybeSingle();
 
   if (fetchUserDataError) throw fetchUserDataError;
-  if (!userData) throw new Error("User not found");
+  if (!userData) throw new Error('User not found');
   const store_location_id = userData.store_employee?.[0].store_location_id;
 
   // ? ----------- Prevent Inactive User Actions -----------
@@ -591,19 +568,19 @@ export const createEmployeeByManager = async (
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
   // ? ---------- Store Location Check -----------
   const isValid = await validStoreLocation(store_location_id);
   if (!isValid) {
-    throw new Error("Store location is not valid");
+    throw new Error('Store location is not valid');
   }
 
   // Check if user with same email or phone number already exists
   const { data: existingUsers, error: fetchError } = await supabase
-    .from("users")
-    .select("id")
+    .from('users')
+    .select('id')
     .or(`email.eq.${email},phone.eq.${phone}`);
 
   if (fetchError) {
@@ -611,30 +588,27 @@ export const createEmployeeByManager = async (
   }
 
   if (existingUsers && existingUsers.length > 0) {
-    throw new Error(
-      "Employee with the same email or phone number already exists",
-    );
+    throw new Error('Employee with the same email or phone number already exists');
   }
 
   // Create user in Supabase Auth
-  const { data: authData, error: authError } =
-    await supabase.auth.admin.createUser({
-      email,
-      phone,
-      password,
-      email_confirm: true,
-      user_metadata: { display_name: name },
-    });
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    phone,
+    password,
+    email_confirm: true,
+    user_metadata: { display_name: name },
+  });
 
   if (authError || !authData?.user) {
-    throw authError || new Error("User creation failed");
+    throw authError || new Error('User creation failed');
   }
 
   const authUserId = authData.user.id;
 
   // Insert into users table
   const { error: dbError, data: insertedUserData } = await supabase
-    .from("users")
+    .from('users')
     .insert({
       auth_user_id: authUserId,
       unique_id,
@@ -650,18 +624,16 @@ export const createEmployeeByManager = async (
 
   if (dbError || !insertedUserData?.length) {
     await supabase.auth.admin.deleteUser(authUserId); // rollback
-    throw dbError || new Error("Failed to insert user record");
+    throw dbError || new Error('Failed to insert user record');
   }
 
   const insertedUserId = insertedUserData[0].id;
 
   // Insert into store_employees table
-  const { error: storeOwnerError } = await supabase
-    .from("store_employees")
-    .insert({
-      store_location_id,
-      user_id: insertedUserId,
-    });
+  const { error: storeOwnerError } = await supabase.from('store_employees').insert({
+    store_location_id,
+    user_id: insertedUserId,
+  });
 
   if (storeOwnerError) {
     await supabase.auth.admin.deleteUser(authUserId); // rollback again
@@ -678,7 +650,7 @@ export const useCreateEmployeeByManager = () => {
     mutationFn: createEmployeeByManager,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["employees-in-same-locations"],
+        queryKey: ['employees-in-same-locations'],
         exact: false,
       });
     },
@@ -700,43 +672,39 @@ export const deleteEmployeeByManager = async ({
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
-  if (!userId) throw new Error("User cannot be fetched");
+  if (!userId) throw new Error('User cannot be fetched');
 
   // Get auth_user_id for Auth deletion
   const { data: userData, error: fetchError } = await supabase
-    .from("users")
-    .select("auth_user_id, role")
-    .eq("id", userId)
+    .from('users')
+    .select('auth_user_id, role')
+    .eq('id', userId)
     .maybeSingle();
 
   if (fetchError || !userData?.auth_user_id) {
-    throw fetchError || new Error("User not found");
+    throw fetchError || new Error('User not found');
   }
 
   const authUserId = userData.auth_user_id;
 
   // Delete from store_employees
   const { error: storeOwnerDeleteError } = await supabase
-    .from("store_employees")
+    .from('store_employees')
     .delete()
-    .eq("id", employeeId);
+    .eq('id', employeeId);
 
   if (storeOwnerDeleteError) throw storeOwnerDeleteError;
 
   // Delete from users table
-  const { error: userDeleteError } = await supabase
-    .from("users")
-    .delete()
-    .eq("id", userId);
+  const { error: userDeleteError } = await supabase.from('users').delete().eq('id', userId);
 
   if (userDeleteError) throw userDeleteError;
 
   // Delete from Supabase Auth
-  const { error: authDeleteError } =
-    await supabase.auth.admin.deleteUser(authUserId);
+  const { error: authDeleteError } = await supabase.auth.admin.deleteUser(authUserId);
 
   if (authDeleteError) throw authDeleteError;
 
@@ -747,18 +715,13 @@ export const useDeleteEmployeeByManager = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      employeeId,
-    }: {
-      userId: string;
-      employeeId: string;
-    }) => deleteEmployeeByManager({ userId, employeeId }),
+    mutationFn: ({ userId, employeeId }: { userId: string; employeeId: string }) =>
+      deleteEmployeeByManager({ userId, employeeId }),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employees'], exact: false });
       queryClient.invalidateQueries({
-        queryKey: ["employees-in-same-locations"],
+        queryKey: ['employees-in-same-locations'],
         exact: false,
       });
     },
@@ -776,20 +739,20 @@ export const updateEmployeeByManager = async ({
   const userProfile = useAuthStore.getState().userProfile;
   const user_id = userProfile?.id;
   const { data: userData, error: fetchUserDataError } = await supabase
-    .from("users")
+    .from('users')
     .select(
       `
       *,
       store_employee:store_employees (
         *
       )
-      `,
+      `
     )
-    .eq("id", user_id)
+    .eq('id', user_id)
     .maybeSingle();
 
   if (fetchUserDataError) throw fetchUserDataError;
-  if (!userData) throw new Error("User not found");
+  if (!userData) throw new Error('User not found');
   const store_location_id = userData.store_employee?.[0].store_location_id;
 
   // ? ----------- Prevent Inactive User Actions -----------
@@ -799,32 +762,32 @@ export const updateEmployeeByManager = async ({
   if (!isUserActive) {
     clearAuth();
     useAuthStore.persist.clearStorage();
-    throw new Error("Your account has been suspended by Super Admin");
+    throw new Error('Your account has been suspended by Super Admin');
   }
 
   // ? ---------- Store Location Check -----------
   const isValid = await validStoreLocation(store_location_id);
   if (!isValid) {
-    throw new Error("Store location is not valid");
+    throw new Error('Store location is not valid');
   }
 
   // Optional: check for duplicates if email/phone changed (excluding self)
   const { data: existingUsers, error: checkError } = await supabase
-    .from("users")
-    .select("id")
+    .from('users')
+    .select('id')
     .or(`email.eq.${email},phone.eq.${phone}`)
-    .neq("id", userId);
+    .neq('id', userId);
 
   if (checkError) throw checkError;
   if (existingUsers?.length) {
-    throw new Error("Employee with this email or phone number already exists");
+    throw new Error('Employee with this email or phone number already exists');
   }
 
   const { data: employee, error: fetchEmployeeError } = await supabase
-    .from("users")
-    .select("auth_user_id")
-    .in("role", ["employee"])
-    .eq("id", userId)
+    .from('users')
+    .select('auth_user_id')
+    .in('role', ['employee'])
+    .eq('id', userId)
     .maybeSingle();
 
   if (fetchEmployeeError) throw fetchEmployeeError;
@@ -832,21 +795,18 @@ export const updateEmployeeByManager = async ({
   const auth_user_id = employee?.auth_user_id;
 
   // Update Supabase Auth email & metadata
-  const { error: authError } = await supabase.auth.admin.updateUserById(
-    auth_user_id,
-    {
-      email,
-      phone,
-      user_metadata: {
-        display_name: name,
-      },
+  const { error: authError } = await supabase.auth.admin.updateUserById(auth_user_id, {
+    email,
+    phone,
+    user_metadata: {
+      display_name: name,
     },
-  );
+  });
   if (authError) throw authError;
 
   // Update in users table
   const { error: dbError } = await supabase
-    .from("users")
+    .from('users')
     .update({
       name,
       email,
@@ -855,7 +815,7 @@ export const updateEmployeeByManager = async ({
       updated_by_user_id: userProfile?.id,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", userId);
+    .eq('id', userId);
 
   if (dbError) throw dbError;
 
@@ -869,10 +829,10 @@ export const useUpdateEmployeeByManager = () => {
     mutationFn: updateEmployeeByManager,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["employees-in-same-locations"],
+        queryKey: ['employees-in-same-locations'],
         exact: false,
       });
-      queryClient.invalidateQueries({ queryKey: ["employee"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['employee'], exact: false });
     },
   });
 };

@@ -13,6 +13,8 @@ const StoreManagementPage = lazy(() => import('@/components/pages/superadmin/Sto
 const NotificationsAlertsPage = lazy(
   () => import('@/components/pages/superadmin/NotificationsAlerts')
 );
+const GenieRequestsPage = lazy(() => import('@/components/pages/superadmin/GenieRequestsPage'));
+const UploadedFilesPage = lazy(() => import('@/components/pages/superadmin/UploadedFilesPage'));
 const LoginPage = lazy(() => import('@/components/pages/LoginPage'));
 const ProfilePage = lazy(() => import('@/components/pages/superadmin/ProfilePage'));
 const OwnerManagement = lazy(() => import('@/components/pages/superadmin/OwnerManagement'));
@@ -79,6 +81,16 @@ const router = createBrowserRouter([
               {
                 path: 'alerts',
                 Component: NotificationsAlertsPage,
+                errorElement: <SomethingWentWrong />,
+              },
+              {
+                path: 'genie-requests',
+                Component: GenieRequestsPage,
+                errorElement: <SomethingWentWrong />,
+              },
+              {
+                path: 'uploaded-files',
+                Component: UploadedFilesPage,
                 errorElement: <SomethingWentWrong />,
               },
             ],

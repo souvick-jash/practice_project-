@@ -176,352 +176,352 @@ export const useFetchFailedImportCount = () => {
 };
 
 // * ====================== Fetch Total Active Vendor Count [Owner/Employee] ====================== *
-const fetchTotalActiveVendorCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
-  let storeOwnerUserId = null;
+// const fetchTotalActiveVendorCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
+//   let storeOwnerUserId = null;
 
-  if (forEmpoyee) {
-    const emp_user_id = useAuthStore.getState().userProfile?.id;
-    const { data: empData, error: empError } = await supabase
-      .from('store_employees')
-      .select(
-        `
-        *,
-        store_location:store_locations(
-          id, store_owner_id,
-            store_owner:store_owners(
-              *
-            )
-          )
-        )
-        `
-      )
-      .eq('user_id', emp_user_id)
-      .maybeSingle();
+//   if (forEmpoyee) {
+//     const emp_user_id = useAuthStore.getState().userProfile?.id;
+//     const { data: empData, error: empError } = await supabase
+//       .from('store_employees')
+//       .select(
+//         `
+//         *,
+//         store_location:store_locations(
+//           id, store_owner_id,
+//             store_owner:store_owners(
+//               *
+//             )
+//           )
+//         )
+//         `
+//       )
+//       .eq('user_id', emp_user_id)
+//       .maybeSingle();
 
-    if (!empData) return 0;
-    if (empError) throw empError;
-    storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
-  } else {
-    storeOwnerUserId = useAuthStore.getState().userProfile?.id;
-  }
+//     if (!empData) return 0;
+//     if (empError) throw empError;
+//     storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
+//   } else {
+//     storeOwnerUserId = useAuthStore.getState().userProfile?.id;
+//   }
 
-  const { data: storeOwnerData, error: storeOwneError } = await supabase
-    .from('store_owners')
-    .select(
-      `
-      *,
-        store_locations(
-        id
-        )
-      `
-    )
-    .eq('user_id', storeOwnerUserId)
-    .maybeSingle();
+//   const { data: storeOwnerData, error: storeOwneError } = await supabase
+//     .from('store_owners')
+//     .select(
+//       `
+//       *,
+//         store_locations(
+//         id
+//         )
+//       `
+//     )
+//     .eq('user_id', storeOwnerUserId)
+//     .maybeSingle();
 
-  if (!storeOwnerData) return 0;
-  if (storeOwneError) throw storeOwneError;
+//   if (!storeOwnerData) return 0;
+//   if (storeOwneError) throw storeOwneError;
 
-  const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
-  if (!storeLocationIds.length) return 0;
+//   const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
+//   if (!storeLocationIds.length) return 0;
 
-  const { count, error } = await supabase
-    .from('vendor_product_map')
-    .select('*', { count: 'exact', head: true })
-    .in('store_location_id', storeLocationIds);
+//   const { count, error } = await supabase
+//     .from('vendor_product_map')
+//     .select('*', { count: 'exact', head: true })
+//     .in('store_location_id', storeLocationIds);
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  const totalUniqueVendors = count || 0;
+//   const totalUniqueVendors = count || 0;
 
-  return totalUniqueVendors;
-};
+//   return totalUniqueVendors;
+// };
 
-export const useFetchTotalActiveVendorCount = ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
-  return useQuery({
-    queryKey: ['total-active-vendor-count', forEmpoyee],
-    queryFn: () => fetchTotalActiveVendorCount({ forEmpoyee }),
-  });
-};
+// export const useFetchTotalActiveVendorCount = ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
+//   return useQuery({
+//     queryKey: ['total-active-vendor-count', forEmpoyee],
+//     queryFn: () => fetchTotalActiveVendorCount({ forEmpoyee }),
+//   });
+// };
 
 // * ====================== Fetch Total Discontinued Product [Owner/Employee] ====================== *
-const fetchTotalDiscontinuedProductCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
-  let storeOwnerUserId = null;
+// const fetchTotalDiscontinuedProductCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
+//   let storeOwnerUserId = null;
 
-  if (forEmpoyee) {
-    const emp_user_id = useAuthStore.getState().userProfile?.id;
-    const { data: empData, error: empError } = await supabase
-      .from('store_employees')
-      .select(
-        `
-        *,
-        store_location:store_locations(
-          id, store_owner_id,
-            store_owner:store_owners(
-              *
-            )
-          )
-        )
-        `
-      )
-      .eq('user_id', emp_user_id)
-      .maybeSingle();
+//   if (forEmpoyee) {
+//     const emp_user_id = useAuthStore.getState().userProfile?.id;
+//     const { data: empData, error: empError } = await supabase
+//       .from('store_employees')
+//       .select(
+//         `
+//         *,
+//         store_location:store_locations(
+//           id, store_owner_id,
+//             store_owner:store_owners(
+//               *
+//             )
+//           )
+//         )
+//         `
+//       )
+//       .eq('user_id', emp_user_id)
+//       .maybeSingle();
 
-    if (!empData) return 0;
-    if (empError) throw empError;
-    storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
-  } else {
-    storeOwnerUserId = useAuthStore.getState().userProfile?.id;
-  }
+//     if (!empData) return 0;
+//     if (empError) throw empError;
+//     storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
+//   } else {
+//     storeOwnerUserId = useAuthStore.getState().userProfile?.id;
+//   }
 
-  const { data: storeOwnerData, error: storeOwneError } = await supabase
-    .from('store_owners')
-    .select(
-      `
-      *,
-        store_locations(
-        id
-        )
-      `
-    )
-    .eq('user_id', storeOwnerUserId)
-    .maybeSingle();
+//   const { data: storeOwnerData, error: storeOwneError } = await supabase
+//     .from('store_owners')
+//     .select(
+//       `
+//       *,
+//         store_locations(
+//         id
+//         )
+//       `
+//     )
+//     .eq('user_id', storeOwnerUserId)
+//     .maybeSingle();
 
-  if (!storeOwnerData) return 0;
-  if (storeOwneError) throw storeOwneError;
+//   if (!storeOwnerData) return 0;
+//   if (storeOwneError) throw storeOwneError;
 
-  const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
+//   const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
 
-  const { count, error } = await supabase
-    .from('products')
-    .select('*', { count: 'exact', head: true })
-    .in('store_location_id', storeLocationIds)
-    .eq('discontinued', true);
+//   const { count, error } = await supabase
+//     .from('products')
+//     .select('*', { count: 'exact', head: true })
+//     .in('store_location_id', storeLocationIds)
+//     .eq('discontinued', true);
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  const discontinuedCount = count || 0;
+//   const discontinuedCount = count || 0;
 
-  return discontinuedCount;
-};
+//   return discontinuedCount;
+// };
 
-export const useFetchTotalDiscontinuedProduct = ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
-  return useQuery({
-    queryKey: ['total-discontinued-product-count', forEmpoyee],
-    queryFn: () => fetchTotalDiscontinuedProductCount({ forEmpoyee }),
-  });
-};
+// export const useFetchTotalDiscontinuedProduct = ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
+//   return useQuery({
+//     queryKey: ['total-discontinued-product-count', forEmpoyee],
+//     queryFn: () => fetchTotalDiscontinuedProductCount({ forEmpoyee }),
+//   });
+// };
 
 // * ====================== Fetch Total Failed Imports [For Owner/Employee] ====================== *
-const fetchFailedImportCountForOwnerCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
-  let storeOwnerUserId = null;
+// const fetchFailedImportCountForOwnerCount = async ({ forEmpoyee }: { forEmpoyee?: boolean }) => {
+//   let storeOwnerUserId = null;
 
-  if (forEmpoyee) {
-    const emp_user_id = useAuthStore.getState().userProfile?.id;
-    const { data: empData, error: empError } = await supabase
-      .from('store_employees')
-      .select(
-        `
-        *,
-        store_location:store_locations(
-          id, store_owner_id,
-            store_owner:store_owners(
-              *
-            )
-          )
-        )
-        `
-      )
-      .eq('user_id', emp_user_id)
-      .maybeSingle();
+//   if (forEmpoyee) {
+//     const emp_user_id = useAuthStore.getState().userProfile?.id;
+//     const { data: empData, error: empError } = await supabase
+//       .from('store_employees')
+//       .select(
+//         `
+//         *,
+//         store_location:store_locations(
+//           id, store_owner_id,
+//             store_owner:store_owners(
+//               *
+//             )
+//           )
+//         )
+//         `
+//       )
+//       .eq('user_id', emp_user_id)
+//       .maybeSingle();
 
-    if (!empData) return 0;
-    if (empError) throw empError;
-    storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
-  } else {
-    storeOwnerUserId = useAuthStore.getState().userProfile?.id;
-  }
+//     if (!empData) return 0;
+//     if (empError) throw empError;
+//     storeOwnerUserId = (empData as any)?.store_location?.store_owner?.user_id;
+//   } else {
+//     storeOwnerUserId = useAuthStore.getState().userProfile?.id;
+//   }
 
-  const { data: storeOwnerData, error: storeOwneError } = await supabase
-    .from('store_owners')
-    .select(
-      `
-      *,
-        store_locations(
-        id
-        )
-      `
-    )
-    .eq('user_id', storeOwnerUserId)
-    .maybeSingle();
+//   const { data: storeOwnerData, error: storeOwneError } = await supabase
+//     .from('store_owners')
+//     .select(
+//       `
+//       *,
+//         store_locations(
+//         id
+//         )
+//       `
+//     )
+//     .eq('user_id', storeOwnerUserId)
+//     .maybeSingle();
 
-  if (!storeOwnerData) return 0;
-  if (storeOwneError) throw storeOwneError;
+//   if (!storeOwnerData) return 0;
+//   if (storeOwneError) throw storeOwneError;
 
-  const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
+//   const storeLocationIds = storeOwnerData.store_locations?.map((loc: any) => loc.id) || [];
 
-  const { count, error } = await supabase
-    .from('sftp_logs')
-    .select('*', { count: 'exact', head: true })
-    .in('store_location_id', storeLocationIds)
-    .eq('status', false);
+//   const { count, error } = await supabase
+//     .from('sftp_logs')
+//     .select('*', { count: 'exact', head: true })
+//     .in('store_location_id', storeLocationIds)
+//     .eq('status', false);
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  const failedCount = count || 0;
+//   const failedCount = count || 0;
 
-  return failedCount;
-};
+//   return failedCount;
+// };
 
-export const useFetchFailedImportCountForOwnerCount = ({
-  forEmpoyee,
-}: {
-  forEmpoyee?: boolean;
-}) => {
-  return useQuery({
-    queryKey: ['total-failed-import-for-owner-count', forEmpoyee],
-    queryFn: () => fetchFailedImportCountForOwnerCount({ forEmpoyee }),
-  });
-};
+// export const useFetchFailedImportCountForOwnerCount = ({
+//   forEmpoyee,
+// }: {
+//   forEmpoyee?: boolean;
+// }) => {
+//   return useQuery({
+//     queryKey: ['total-failed-import-for-owner-count', forEmpoyee],
+//     queryFn: () => fetchFailedImportCountForOwnerCount({ forEmpoyee }),
+//   });
+// };
 
 // * ====================== Fetch Total Scanned Products [For Owner] ====================== *
-const fetchTotalScannedProductCount = async () => {
-  const userId = useAuthStore.getState().userProfile?.id;
+// const fetchTotalScannedProductCount = async () => {
+//   const userId = useAuthStore.getState().userProfile?.id;
 
-  // Get store location IDs for the store owner
-  const { data: locations, error: locError } = await supabase
-    .from('store_locations')
-    .select('id')
-    .eq('store_owner_id', userId);
+//   // Get store location IDs for the store owner
+//   const { data: locations, error: locError } = await supabase
+//     .from('store_locations')
+//     .select('id')
+//     .eq('store_owner_id', userId);
 
-  if (locError) throw locError;
-  if (!locations?.length) return 0;
+//   if (locError) throw locError;
+//   if (!locations?.length) return 0;
 
-  const locationIds = locations.map((l) => l.id);
+//   const locationIds = locations.map((l) => l.id);
 
-  // Get total scanned product count via an exact count query
-  const { count, error: countError } = await supabase
-    .from('qr_scans')
-    .select('*', { count: 'exact', head: true })
-    .filter(
-      'product_id',
-      'in',
-      `(select id from products where store_location_id in (${locationIds.map((id) => `'${id}'`).join(',')}))`
-    );
+//   // Get total scanned product count via an exact count query
+//   const { count, error: countError } = await supabase
+//     .from('qr_scans')
+//     .select('*', { count: 'exact', head: true })
+//     .filter(
+//       'product_id',
+//       'in',
+//       `(select id from products where store_location_id in (${locationIds.map((id) => `'${id}'`).join(',')}))`
+//     );
 
-  if (countError) throw countError;
+//   if (countError) throw countError;
 
-  return count ?? 0;
-};
+//   return count ?? 0;
+// };
 
-export const useFetchTotalScannedProductCount = () => {
-  return useQuery({
-    queryKey: ['total-scanned-product-count'],
-    queryFn: fetchTotalScannedProductCount,
-  });
-};
+// export const useFetchTotalScannedProductCount = () => {
+//   return useQuery({
+//     queryKey: ['total-scanned-product-count'],
+//     queryFn: fetchTotalScannedProductCount,
+//   });
+// };
 
 // * ====================== Recent QR Scan Activity [For Owner] ====================== *
-const fetchRecentQRScanActivity = async ({ limit }: { limit?: number }) => {
-  const userId = useAuthStore.getState().userProfile?.id;
+// const fetchRecentQRScanActivity = async ({ limit }: { limit?: number }) => {
+//   const userId = useAuthStore.getState().userProfile?.id;
 
-  // Get store location IDs for the store owner
-  const { data: locations, error: locError } = await supabase
-    .from('store_locations')
-    .select('id')
-    .eq('store_owner_id', userId);
+//   // Get store location IDs for the store owner
+//   const { data: locations, error: locError } = await supabase
+//     .from('store_locations')
+//     .select('id')
+//     .eq('store_owner_id', userId);
 
-  if (locError) throw locError;
-  if (!locations?.length) return [];
+//   if (locError) throw locError;
+//   if (!locations?.length) return [];
 
-  const locationIds = locations.map((l) => l.id);
+//   const locationIds = locations.map((l) => l.id);
 
-  // Get recent QR scan activity for products belonging to these locations
-  const { data, error } = await supabase
-    .from('qr_scans')
-    .select(
-      `
-      *,
-      product:products (
-        id, name, style, color, uom, sku,
-        store_location:store_locations (
-          id, name
-        )
-      ),
-      qr_code:qr_codes (
-        id, product_id, qr_code_image_url
-      )
-      `
-    )
-    .filter(
-      'product_id',
-      'in',
-      `(select id from products where store_location_id in (${locationIds
-        .map((id) => `'${id}'`)
-        .join(',')}))`
-    )
-    .order('created_at', { ascending: false })
-    .limit(limit ?? 10);
+//   // Get recent QR scan activity for products belonging to these locations
+//   const { data, error } = await supabase
+//     .from('qr_scans')
+//     .select(
+//       `
+//       *,
+//       product:products (
+//         id, name, style, color, uom, sku,
+//         store_location:store_locations (
+//           id, name
+//         )
+//       ),
+//       qr_code:qr_codes (
+//         id, product_id, qr_code_image_url
+//       )
+//       `
+//     )
+//     .filter(
+//       'product_id',
+//       'in',
+//       `(select id from products where store_location_id in (${locationIds
+//         .map((id) => `'${id}'`)
+//         .join(',')}))`
+//     )
+//     .order('created_at', { ascending: false })
+//     .limit(limit ?? 10);
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  return data ?? [];
-};
+//   return data ?? [];
+// };
 
-export const useFetchRecentQRScanActivity = ({ limit }: { limit?: number }) => {
-  return useQuery({
-    queryKey: ['recent-qr-scan-activity', limit],
-    queryFn: () => fetchRecentQRScanActivity({ limit }),
-  });
-};
+// export const useFetchRecentQRScanActivity = ({ limit }: { limit?: number }) => {
+//   return useQuery({
+//     queryKey: ['recent-qr-scan-activity', limit],
+//     queryFn: () => fetchRecentQRScanActivity({ limit }),
+//   });
+// };
 
 // * ====================== Top Scanned Products [For Owner] ====================== *
-const fetchMostScannedProducts = async ({ limit = 10 }: { limit?: number }) => {
-  const userId = useAuthStore.getState().userProfile?.id;
+// const fetchMostScannedProducts = async ({ limit = 10 }: { limit?: number }) => {
+//   const userId = useAuthStore.getState().userProfile?.id;
 
-  // Get all store location IDs for this owner
-  const { data: locations, error: locError } = await supabase
-    .from('store_locations')
-    .select('id')
-    .eq('store_owner_id', userId);
+//   // Get all store location IDs for this owner
+//   const { data: locations, error: locError } = await supabase
+//     .from('store_locations')
+//     .select('id')
+//     .eq('store_owner_id', userId);
 
-  if (locError) throw locError;
-  if (!locations?.length) return [];
+//   if (locError) throw locError;
+//   if (!locations?.length) return [];
 
-  const locationIds = locations.map((l) => l.id);
+//   const locationIds = locations.map((l) => l.id);
 
-  // Fetch top products by scan count directly using a subquery
-  const { data, error } = await supabase
-    .from('products')
-    .select(
-      `
-      id,
-      name,
-      style,
-      color,
-      uom,
-      sku,
-      qr_code:qr_codes (id, qr_code_image_url),
-      store_location:store_locations (id, name)
-      `
-    )
-    .filter(
-      'id',
-      'in',
-      `(select product_id from qr_scans where product_id in (
-         select id from products where store_location_id in (${locationIds
-           .map((id) => `'${id}'`)
-           .join(',')})
-       ) group by product_id order by count(*) desc limit ${limit})`
-    );
+//   // Fetch top products by scan count directly using a subquery
+//   const { data, error } = await supabase
+//     .from('products')
+//     .select(
+//       `
+//       id,
+//       name,
+//       style,
+//       color,
+//       uom,
+//       sku,
+//       qr_code:qr_codes (id, qr_code_image_url),
+//       store_location:store_locations (id, name)
+//       `
+//     )
+//     .filter(
+//       'id',
+//       'in',
+//       `(select product_id from qr_scans where product_id in (
+//          select id from products where store_location_id in (${locationIds
+//            .map((id) => `'${id}'`)
+//            .join(',')})
+//        ) group by product_id order by count(*) desc limit ${limit})`
+//     );
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  return data ?? [];
-};
+//   return data ?? [];
+// };
 
-export const useFetchMostScannedProducts = ({ limit }: { limit?: number }) => {
-  return useQuery({
-    queryKey: ['most-scanned-products', limit],
-    queryFn: () => fetchMostScannedProducts({ limit }),
-  });
-};
+// export const useFetchMostScannedProducts = ({ limit }: { limit?: number }) => {
+//   return useQuery({
+//     queryKey: ['most-scanned-products', limit],
+//     queryFn: () => fetchMostScannedProducts({ limit }),
+//   });
+// };
